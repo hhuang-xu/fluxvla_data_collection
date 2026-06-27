@@ -1,0 +1,125 @@
+dataset:
+  dataset_dir: /home/franka/Data/raw_data
+  task_name: dual_franka_teleop
+  task_description: ""
+  station_idx: franka_dual
+  frame_rate: 30
+  max_timesteps: 50000
+  flush_every_n: 100
+  drop_warning_factor: 1.5
+  no_frame_warning_timeout: 1.0
+  no_frame_warning_interval: 5.0
+  camera_info_timeout: 5.0
+
+sync:
+  slop: 0.05
+  queue_size: 60
+  frame_queue_size: 300
+  latest_buffer_size: 1000
+
+control:
+  command_topic: /data_collection/record_cmd
+  command_type: std_msgs/String
+
+topics:
+  - name: cam_front_rgb
+    topic: /camera_front/color/image_raw
+    type: sensor_msgs/Image
+    sync: required
+    converter: image_png
+    encoding: bgr8
+    output: /observations/images/cam_front
+
+  - name: cam_wrist_left_rgb
+    topic: /camera_left_wrist/color/image_raw
+    type: sensor_msgs/Image
+    sync: required
+    converter: image_png
+    encoding: bgr8
+    output: /observations/images/cam_wrist_left
+
+  - name: cam_wrist_right_rgb
+    topic: /camera_right_wrist/color/image_raw
+    type: sensor_msgs/Image
+    sync: required
+    converter: image_png
+    encoding: bgr8
+    output: /observations/images/cam_wrist_right
+
+  - name: left_state
+    topic: /left_arm/franka_state_controller/franka_states
+    type: franka_msgs/FrankaState
+    sync: required
+    converter: franka_state
+    outputs:
+      qpos: /observations/left/qpos
+      qvel: /observations/left/qvel
+      effort: /observations/left/effort
+      eepose: /observations/left/eepose
+
+  - name: right_state
+    topic: /right_arm/franka_state_controller/franka_states
+    type: franka_msgs/FrankaState
+    sync: required
+    converter: franka_state
+    outputs:
+      qpos: /observations/right/qpos
+      qvel: /observations/right/qvel
+      effort: /observations/right/effort
+      eepose: /observations/right/eepose
+
+  - name: left_gripper_state
+    topic: /left_arm/franka_gripper/joint_states
+    type: sensor_msgs/JointState
+    sync: latest_before
+    converter: gripper_joint_width
+    output: /observations/left/gripper_position
+    default: [0.0]
+
+  - name: right_gripper_state
+    topic: /right_arm/franka_gripper/joint_states
+    type: sensor_msgs/JointState
+    sync: latest_before
+    converter: gripper_joint_width
+    output: /observations/right/gripper_position
+    default: [0.0]
+
+  - name: left_action_eepose
+    topic: /left_arm/cartesian_impedance_controller/equilibrium_pose
+    type: geometry_msgs/PoseStamped
+    sync: latest_before
+    converter: pose_stamped_7d
+    output: /action/left/eepose
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+  - name: right_action_eepose
+    topic: /right_arm/cartesian_impedance_controller/equilibrium_pose
+    type: geometry_msgs/PoseStamped
+    sync: latest_before
+    converter: pose_stamped_7d
+    output: /action/right/eepose
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+  - name: left_joy
+    topic: /controller/left/joy
+    type: sensor_msgs/Joy
+    sync: latest_before
+    converter: joy_fixed
+    output: /device/left/joy
+    params:
+      button_count: 5
+      axis_count: 3
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+  - name: right_joy
+    topic: /controller/right/joy
+    type: sensor_msgs/Joy
+    sync: latest_before
+    converter: joy_fixed
+    output: /device/right/joy
+    params:
+      button_count: 5
+      axis_count: 3
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+computed_columns: []

@@ -1,0 +1,91 @@
+dataset:
+  dataset_dir: /home/franka/Data/raw_data
+  task_name: ur3_teleop
+  task_description: ""
+  station_idx: ur3
+  frame_rate: 30
+  max_timesteps: 50000
+  flush_every_n: 100
+  drop_warning_factor: 1.5
+  no_frame_warning_timeout: 1.0
+  no_frame_warning_interval: 5.0
+  camera_info_timeout: 5.0
+
+sync:
+  slop: 0.05
+  queue_size: 60
+  frame_queue_size: 300
+  latest_buffer_size: 1000
+
+control:
+  command_topic: /data_collection/record_cmd
+  command_type: std_msgs/String
+
+topics:
+  - name: cam_high_rgb
+    topic: /front_camera/color/image_raw
+    type: sensor_msgs/Image
+    sync: required
+    converter: image_png
+    encoding: bgr8
+    output: /observations/images/cam_high
+
+  - name: cam_wrist_rgb
+    topic: /wrist_camera/color/image_raw
+    type: sensor_msgs/Image
+    sync: required
+    converter: image_png
+    encoding: bgr8
+    output: /observations/images/cam_wrist
+
+  - name: ur_joint_state
+    topic: /joint_states
+    type: sensor_msgs/JointState
+    sync: required
+    converter: joint_state_named
+    params:
+      joint_names:
+        - shoulder_pan_joint
+        - shoulder_lift_joint
+        - elbow_joint
+        - wrist_1_joint
+        - wrist_2_joint
+        - wrist_3_joint
+    outputs:
+      qpos: /observations/qpos
+      qvel: /observations/qvel
+      effort: /observations/effort
+
+  - name: ur_eepose
+    topic: /arm/tcp_pose
+    type: geometry_msgs/PoseStamped
+    sync: required
+    converter: pose_stamped_7d
+    output: /observations/eepose
+
+  - name: gripper_position
+    topic: /gripper/position
+    type: std_msgs/Float32
+    sync: latest_before
+    converter: float32
+    output: /observations/gripper_position
+    default: [0.0]
+
+  - name: action_eepose
+    topic: /arm/tcp_pose
+    type: geometry_msgs/PoseStamped
+    sync: latest_before
+    converter: pose_stamped_7d
+    output: /action/eepose
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+  - name: teleop_joy
+    topic: /controller/right/joy
+    type: sensor_msgs/Joy
+    sync: latest_before
+    converter: joy_fixed
+    output: /device/joy
+    params:
+      button_count: 5
+      axis_count: 3
+    default: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]

@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# ROS/catkin local outputs
+build/
+devel/
+install/
+log/
+
+# Local runtime outputs
+*.parquet
+*.meta.json
+camera_info.json
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+.DS_Store
