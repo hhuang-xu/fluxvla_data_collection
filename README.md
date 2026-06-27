@@ -347,6 +347,60 @@ config path, topic list, sync settings, and frame count. The Parquet footer also
 contains `fluxvla.task_description`, so the description remains attached when
 only the `.parquet` file is copied.
 
+## Post-Processing
+
+The package also includes a schema-driven post-processing chain. Robot-specific
+layout lives in `config/processing_*.yaml`; the Python code only follows the
+declared feature and camera columns.
+
+Convert raw Parquet episodes to processed `NPY + MP4 + info.json` folders:
+
+```bash
+rosrun fluxvla_data_collection preprocess_fluxvla_parquet.py \
+  --raw-root /home/franka/Data/raw_data \
+  --subfolder 20260627 \
+  --spec $(rospack find fluxvla_data_collection)/config/processing_dual_franka.yaml \
+  --output-root /home/franka/Data/processed_data \
+  --output-prefix RealRobot_DualFranka \
+  --video-codec mp4v
+```
+
+Generate LeRobot annotation JSON. If `--task` is omitted, the script uses the
+`task_description` stored during recording:
+
+```bash
+rosrun fluxvla_data_collection generate_fluxvla_annotations.py \
+  --processed-root /home/franka/Data/processed_data \
+  --folder-pattern "RealRobot_DualFranka_20260627*" \
+  --output /home/franka/Data/processed_data/franka_dual_annotations.json
+```
+
+Export to LeRobot:
+
+```bash
+rosrun fluxvla_data_collection convert_fluxvla_to_lerobot.py \
+  --repo-id franka_dual/20260627_dual_franka_teleop \
+  --annotation-json /home/franka/Data/processed_data/franka_dual_annotations.json \
+  --spec $(rospack find fluxvla_data_collection)/config/processing_dual_franka.yaml \
+  --output-root /home/franka/Data/lerobot \
+  --mode video \
+  --fps 30 \
+  --video-codec h264
+```
+
+Processing specs use generic `features` and `cameras` sections:
+
+- `features[*].sources`: Parquet columns to concatenate in order.
+- `features[*].names`: semantic names for the resulting vector dimensions.
+- `features[*].output`: processed NPY file name.
+- `features[*].lerobot_key`: optional LeRobot feature key.
+- `cameras[*].column`: Parquet image column containing encoded image bytes.
+- `cameras[*].output`: processed MP4 file name.
+- `cameras[*].lerobot_key`: optional LeRobot image feature key.
+
+Add a new robot platform by adding a new `processing_<robot>.yaml`; no Python
+code changes are required if the recorded Parquet columns already exist.
+
 ## Example Schemas
 
 ### Dual Franka

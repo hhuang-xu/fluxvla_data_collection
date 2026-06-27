@@ -1,0 +1,80 @@
+robot:
+  robot_type: ur3
+  fps: 30
+
+features:
+  - name: state
+    output: qpos.npy
+    lerobot_key: observation.state
+    dtype: float32
+    required: true
+    sources:
+      - column: /observations/qpos
+      - column: /observations/gripper_position
+    names:
+      - shoulder_pan_joint
+      - shoulder_lift_joint
+      - elbow_joint
+      - wrist_1_joint
+      - wrist_2_joint
+      - wrist_3_joint
+      - gripper
+
+  - name: eepose
+    output: eepose.npy
+    lerobot_key: observation.eepose
+    dtype: float32
+    required: false
+    sources:
+      - column: /observations/eepose
+      - column: /observations/gripper_position
+    names:
+      - x
+      - y
+      - z
+      - qx
+      - qy
+      - qz
+      - qw
+      - gripper
+
+  - name: gripper
+    output: gripper.npy
+    dtype: float32
+    required: false
+    sources:
+      - column: /observations/gripper_position
+    names:
+      - gripper
+
+  - name: action
+    output: action.npy
+    lerobot_key: action
+    dtype: float32
+    required: false
+    sources:
+      - column: /action/eepose
+    names:
+      - x
+      - y
+      - z
+      - qx
+      - qy
+      - qz
+      - qw
+
+cameras:
+  - name: front
+    column: /observations/images/cam_high
+    output: rgb.mp4
+    lerobot_key: observation.images.cam_high
+    shape: [720, 1280]
+    required: true
+
+  - name: wrist
+    column: /observations/images/cam_wrist
+    output: rgb_wrist.mp4
+    lerobot_key: observation.images.cam_wrist
+    shape: [480, 848]
+    required: true
+

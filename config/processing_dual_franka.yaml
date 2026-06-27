@@ -1,0 +1,118 @@
+robot:
+  robot_type: franka_dual
+  fps: 30
+
+features:
+  - name: state
+    output: qpos.npy
+    lerobot_key: observation.state
+    dtype: float32
+    required: true
+    sources:
+      - column: /observations/left/qpos
+      - column: /observations/left/gripper_position
+      - column: /observations/right/qpos
+      - column: /observations/right/gripper_position
+    names:
+      - left_panda_joint1
+      - left_panda_joint2
+      - left_panda_joint3
+      - left_panda_joint4
+      - left_panda_joint5
+      - left_panda_joint6
+      - left_panda_joint7
+      - left_gripper
+      - right_panda_joint1
+      - right_panda_joint2
+      - right_panda_joint3
+      - right_panda_joint4
+      - right_panda_joint5
+      - right_panda_joint6
+      - right_panda_joint7
+      - right_gripper
+
+  - name: eepose
+    output: eepose.npy
+    lerobot_key: observation.eepose
+    dtype: float32
+    required: false
+    sources:
+      - column: /observations/left/eepose
+      - column: /observations/left/gripper_position
+      - column: /observations/right/eepose
+      - column: /observations/right/gripper_position
+    names:
+      - left_x
+      - left_y
+      - left_z
+      - left_qx
+      - left_qy
+      - left_qz
+      - left_qw
+      - left_gripper
+      - right_x
+      - right_y
+      - right_z
+      - right_qx
+      - right_qy
+      - right_qz
+      - right_qw
+      - right_gripper
+
+  - name: gripper
+    output: gripper.npy
+    dtype: float32
+    required: false
+    sources:
+      - column: /observations/left/gripper_position
+      - column: /observations/right/gripper_position
+    names:
+      - left_gripper
+      - right_gripper
+
+  - name: action
+    output: action.npy
+    lerobot_key: action
+    dtype: float32
+    required: false
+    sources:
+      - column: /action/left/eepose
+      - column: /action/right/eepose
+    names:
+      - left_x
+      - left_y
+      - left_z
+      - left_qx
+      - left_qy
+      - left_qz
+      - left_qw
+      - right_x
+      - right_y
+      - right_z
+      - right_qx
+      - right_qy
+      - right_qz
+      - right_qw
+
+cameras:
+  - name: front
+    column: /observations/images/cam_front
+    output: rgb.mp4
+    lerobot_key: observation.images.cam_front
+    shape: [480, 640]
+    required: true
+
+  - name: wrist_left
+    column: /observations/images/cam_wrist_left
+    output: rgb_wrist_left.mp4
+    lerobot_key: observation.images.cam_wrist_left
+    shape: [480, 640]
+    required: true
+
+  - name: wrist_right
+    column: /observations/images/cam_wrist_right
+    output: rgb_wrist_right.mp4
+    lerobot_key: observation.images.cam_wrist_right
+    shape: [480, 640]
+    required: true
+

@@ -16,6 +16,9 @@ catkin_package()
 
 catkin_install_python(PROGRAMS
   scripts/collect_data_generic_parquet.py
+  scripts/preprocess_fluxvla_parquet.py
+  scripts/generate_fluxvla_annotations.py
+  scripts/convert_fluxvla_to_lerobot.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
