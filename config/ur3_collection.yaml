@@ -1,5 +1,5 @@
 dataset:
-  dataset_dir: /home/franka/Data/raw_data
+  dataset_dir: /home/ur3/Data/raw_data
   task_name: ur3_teleop
   task_description: ""
   station_idx: ur3
@@ -65,7 +65,7 @@ topics:
 
   - name: gripper_position
     topic: /gripper/position
-    type: std_msgs/Float32
+    type: robotiq/StampedFloat32
     sync: latest_before
     converter: float32
     output: /observations/gripper_position
